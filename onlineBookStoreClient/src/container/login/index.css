@@ -1,4 +1,3 @@
-
 .login-container {
   display: flex;
   justify-content: center;
@@ -34,6 +33,7 @@ input {
   border-radius: 4px;
   box-sizing: border-box;
 }
+
 .form-button {
   width: 100%;
   padding: 10px;
@@ -44,9 +44,16 @@ input {
   cursor: pointer;
   margin-top: 10px;
 }
+}
 
 .form-button.already-user {
   background-color: #64bad6;
   color: white;
 }
 
+.form-button:disabled {
+  background-color: #d3d3d3;
+  color: #a9a9a9;
+  cursor: not-allowed;
+  pointer-events: none;
+}

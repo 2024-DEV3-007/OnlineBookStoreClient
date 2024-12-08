@@ -57,3 +57,33 @@ test("Toggle between register screen and Login Screen when user clicks on New Us
       expect(confirmPasswordField).toBeInTheDocument();
 
 });
+
+test("Login button should be enabled only after filling all the fields", () => {
+    render(<Login />);
+    const LoginButton = screen.getByTestId('login-id');
+    expect(LoginButton).toBeDisabled();
+    const userNameInput = screen.getByPlaceholderText('Username');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    fireEvent.change(userNameInput, { target: { value: 'testUser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    expect(LoginButton).toBeEnabled();
+ });
+
+test("Register button should be enabled only after filling all the fields", () => {
+    render(<Login />);
+    const toggleUserTypeButton = screen.getByTestId('toggle-user-type');
+    fireEvent.click(toggleUserTypeButton);
+    const registerButton = screen.getByTestId('login-id');
+    expect(registerButton).toBeDisabled();
+    const userNameInput = screen.getByPlaceholderText('Username');
+    const firstNameInput = screen.getByPlaceholderText('First Name');
+    const lastNameInput = screen.getByPlaceholderText('Last Name');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const confirmPasswordInput = screen.getByPlaceholderText('Confirm Password');
+    fireEvent.change(userNameInput, { target: { value: 'testUser' } });
+    fireEvent.change(firstNameInput, { target: { value: 'John' } });
+    fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.change(confirmPasswordInput, { target: { value: 'password123' } });
+    expect(registerButton).toBeEnabled();
+ });
