@@ -14,3 +14,6 @@ export const LAST_NAME="Last Name";
 export const CONFIRM_PASSWORD="Confirm Password";
 export const ALREADY_A_USER="Already a user?";
 export const NEW_USER="New User";
+export const getHostName = () => {return "http://localhost:8080";}
+export const API = { register:"/api/register"
+};

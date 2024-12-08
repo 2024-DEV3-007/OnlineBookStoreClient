@@ -1,9 +1,16 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import axios from "axios";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 import Login from "./index";
 
+afterEach(() => {
+  jest.clearAllMocks();
+  axios.post.mockClear();
+})
+
+jest.mock("axios");
 
 test('Displays Login header in the Login page', () => {
 
@@ -146,4 +153,95 @@ test("Register button should be enabled only after filling all the fields", () =
        fireEvent.change(confirmPasswordInput, { target: { value: 'password' } });
        expect(registerButton).toBeDisabled;
  });
+
+test("User Registration Successful",  async() => {
+
+     const mockResponse = { validResponse: true, message: "Registration successful!" };
+     axios.post.mockResolvedValueOnce({ data: mockResponse });
+     const formData = {username: "John",firstName: "John",lastName: "Doe",password: "password123"};
+
+     render(<Router><Login /></Router>);
+     const toggleUserTypeButton = screen.getByTestId('toggle-user-type');
+     fireEvent.click(toggleUserTypeButton);
+
+      const userNameInput = screen.getByPlaceholderText('Username');
+      const firstNameInput = screen.getByPlaceholderText('First Name');
+      const lastNameInput = screen.getByPlaceholderText('Last Name');
+      const passwordInput = screen.getByPlaceholderText('Password');
+      const confirmPasswordInput = screen.getByPlaceholderText('Confirm Password');
+
+      fireEvent.change(userNameInput, { target: { value: 'John' } });
+      fireEvent.change(firstNameInput, { target: { value: 'John' } });
+      fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
+      fireEvent.change(passwordInput, { target: { value: 'password123' } });
+      fireEvent.change(confirmPasswordInput, { target: { value: 'password123' } });
+      fireEvent.click(screen.getByTestId('login-id'));
+
+     const response = await waitFor(() =>
+            screen.getByTestId('success-message'));
+
+      expect(response).toHaveTextContent('Registration successful!');
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith("http://localhost:8080/api/register", formData);
+  });
+
+test("Existing user tries to register again",  async() => {
+
+    const mockResponse = { validResponse: false, message: "User already exists!" };
+    axios.post.mockResolvedValueOnce({ data: mockResponse });
+    const formData = {username: "John",firstName: "John",lastName: "Doe",password: "password123"};
+
+    render(<Router><Login /></Router>);
+    const toggleUserTypeButton = screen.getByTestId('toggle-user-type');
+    fireEvent.click(toggleUserTypeButton);
+
+     const userNameInput = screen.getByPlaceholderText('Username');
+     const firstNameInput = screen.getByPlaceholderText('First Name');
+     const lastNameInput = screen.getByPlaceholderText('Last Name');
+     const passwordInput = screen.getByPlaceholderText('Password');
+     const confirmPasswordInput = screen.getByPlaceholderText('Confirm Password');
+
+     fireEvent.change(userNameInput, { target: { value: 'John' } });
+     fireEvent.change(firstNameInput, { target: { value: 'John' } });
+     fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
+     fireEvent.change(passwordInput, { target: { value: 'password123' } });
+     fireEvent.change(confirmPasswordInput, { target: { value: 'password123' } });
+     fireEvent.click(screen.getByTestId('login-id'));
+
+      const errorResponse = await waitFor(() =>screen.getByTestId('error-message'));
+
+      expect(errorResponse).toHaveTextContent('User already exists!');
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith("http://localhost:8080/api/register", formData);
+  });
+
+test("When unexpected error occurs while registering,display the message",  async() => {
+
+    const mockResponse = { validResponse: false, message: "An unexpected error occurred. Please try again later."};
+    axios.post.mockRejectedValueOnce ({ data: mockResponse });
+    render(<Router><Login /></Router>);
+
+    const toggleUserTypeButton = screen.getByTestId('toggle-user-type');
+    fireEvent.click(toggleUserTypeButton);
+
+    const userNameInput = screen.getByPlaceholderText('Username');
+    const firstNameInput = screen.getByPlaceholderText('First Name');
+    const lastNameInput = screen.getByPlaceholderText('Last Name');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const confirmPasswordInput = screen.getByPlaceholderText('Confirm Password');
+
+    fireEvent.change(userNameInput, { target: { value: 'John' } });
+    fireEvent.change(firstNameInput, { target: { value: 'John' } });
+    fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.change(confirmPasswordInput, { target: { value: 'password123' } });
+    fireEvent.click(screen.getByTestId('login-id'));
+
+    const formData = {username: "John",firstName: "John",lastName: "Doe",password: "password123"};
+    const errorResponse = await waitFor(() => screen.getByTestId('error-message'));
+
+    expect(errorResponse).toHaveTextContent("An unexpected error occurred. Please try again later.");
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    expect(axios.post).toHaveBeenCalledWith("http://localhost:8080/api/register", formData);
+  });
 
