@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import {EMPTY_FORM_DATA,LOGIN,USERNAME,PASSWORD,REGISTER,FIRST_NAME,LAST_NAME,CONFIRM_PASSWORD,ALREADY_A_USER,NEW_USER,getHostName,API} from "../../utils/constants";
 import { FaCheck, FaTimes } from 'react-icons/fa';
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./index.css";
 
 const Login = () => {
+const navigate = useNavigate();
 const [formData,setFormData] = useState(EMPTY_FORM_DATA);
 const [isNewUser, setIsNewUser] = useState(false);
 const [isPasswordMatch, setIsPasswordMatch] = useState(false);
@@ -33,6 +35,7 @@ const handlePasswordChange = (value) => {
 const toggleNewUser = () => {
   setIsNewUser(!isNewUser);
   setFormData(EMPTY_FORM_DATA);
+  setErrorMessage("");
   };
 
   const isLoginFormInvalid = () => {
@@ -64,7 +67,8 @@ const handleSuccess = (message) => {
   const handleError = (error) => {
     setSuccessMessage("");
     const errorMessage = error?.response?.data?.message || "An unexpected error occurred. Please try again later.";
-       setErrorMessage(errorMessage);
+    setErrorMessage(errorMessage);
+    setFormData(EMPTY_FORM_DATA);
   };
 
 const handleRegister = async () => {
@@ -82,12 +86,43 @@ const handleRegister = async () => {
     }
   };
 
+const handleLogin = async () => {
+    console.log("Attempting login with username:", formData.username);
+    try {
+      const response = await axios.post("http://localhost:8080/api/login", {
+        username: formData.username,
+        password: formData.password,
+      });
+
+      const responseData = response.data;
+      console.log("Login response:", response.data);
+
+      if (responseData.validResponse) {
+        setSuccessMessage(responseData.message);
+        setErrorMessage("");
+
+        navigate("/books", {
+          state: {
+            username: formData.username,
+            password: formData.password,
+          },
+        });
+      } else {
+        setSuccessMessage("");
+        setErrorMessage(responseData.message);
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
  return (
     <div className="login-container">
       <div className="login-form">
         <h1 data-testid="login-heading">{isNewUser ? REGISTER : LOGIN}</h1>
         {successMessage && <div className="success-message" data-testid="success-message">{successMessage}</div>}
         {errorMessage && <div className="error-message" data-testid="error-message">{errorMessage}</div>}
+        <span className="info-message">(Please fill all the details)</span>
          <div className="form-group">
             <input type="text" name="username" placeholder={USERNAME} value={formData.username}
                     onChange={updateFormData} />
@@ -115,7 +150,7 @@ const handleRegister = async () => {
                </div>
          )}
         <button className="form-button" data-testid="login-id"
-            disabled={isNewUser?isRegisterFormInvalid():isLoginFormInvalid()} onClick={handleRegister}>
+            disabled={isNewUser?isRegisterFormInvalid():isLoginFormInvalid()} onClick={isNewUser ? handleRegister : handleLogin}>
             {isNewUser ? REGISTER : LOGIN}
         </button>
         <button className={"form-button already-user"} data-testid="toggle-user-type"

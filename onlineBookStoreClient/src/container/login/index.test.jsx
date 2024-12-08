@@ -245,3 +245,62 @@ test("When unexpected error occurs while registering,display the message",  asyn
     expect(axios.post).toHaveBeenCalledWith("http://localhost:8080/api/register", formData);
   });
 
+test("User Logins in to the book store successfully",  async() => {
+
+     const mockResponse = { validResponse: true, message: "Login Success!" };
+     const formData = {username: "John",password: "password123"};
+     axios.post.mockResolvedValueOnce({ data: mockResponse });
+     render(<Router><Login /></Router>);
+
+    const userNameInput = screen.getByPlaceholderText('Username');
+    const passwordInput = screen.getByPlaceholderText('Password');
+
+    fireEvent.change(userNameInput, { target: { value: 'John' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(screen.getByTestId('login-id'));
+
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    expect(axios.post).toHaveBeenCalledWith("http://localhost:8080/api/login", formData);
+  });
+
+test("User Login in using invalid credentials,display the message",  async() => {
+
+     const mockResponse = { validResponse: false, message: "Invalid credentials!" };
+     const formData = {username: "John",password: "password123"};
+     axios.post.mockResolvedValueOnce({ data: mockResponse });
+     render(<Router><Login /></Router>);
+
+     const userNameInput = screen.getByPlaceholderText('Username');
+     const passwordInput = screen.getByPlaceholderText('Password');
+     fireEvent.change(userNameInput, { target: { value: 'John' } });
+     fireEvent.change(passwordInput, { target: { value: 'password123' } });
+     fireEvent.click(screen.getByTestId('login-id'));
+
+     const errorResponse = await waitFor(() => screen.getByTestId('error-message'));
+     expect(axios.post).toHaveBeenCalledTimes(1);
+     expect(axios.post).toHaveBeenCalledWith("http://localhost:8080/api/login", formData);
+     expect(errorResponse).toHaveTextContent("Invalid credentials!");
+  });
+
+test("When unexpected error occurs while login,display the message",  async() => {
+
+    const mockResponse = { validResponse: false, message: "An unexpected error occurred. Please try again later."};
+    const formData = {username: "John",password: "password123"};
+    axios.post.mockRejectedValueOnce ({ data: mockResponse });
+    render(<Router><Login /></Router>);
+
+    const userNameInput = screen.getByPlaceholderText('Username');
+    const passwordInput = screen.getByPlaceholderText('Password');
+
+    fireEvent.change(userNameInput, { target: { value: 'John' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(screen.getByTestId('login-id'));
+
+    const errorResponse = await waitFor(() =>screen.getByTestId('error-message'));
+
+    expect(errorResponse).toHaveTextContent("An unexpected error occurred. Please try again later.");
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    expect(axios.post).toHaveBeenCalledWith("http://localhost:8080/api/login", formData);
+  });
+
+
