@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {useLocation, useNavigate } from "react-router-dom";
+import {getHostName,API} from "../../utils/constants";
 import "./index.css";
 
  const BookStore = () => {
@@ -27,7 +28,7 @@ import "./index.css";
 const fetchBooks = () => {
     setError(null);
     axios
-      .get("http://localhost:8080/api/books", {
+      .get(getHostName()+API.fetchBooks, {
         headers: {
           Authorization: `Basic ${encodedCredentials}`,
         },
@@ -43,7 +44,7 @@ const fetchBooks = () => {
 const fetchCartData = () => {
     setError(null);
     axios
-      .get("http://localhost:8080/api/cart", {
+      .get(getHostName()+API.fetchCart, {
         headers: {
           Authorization: `Basic ${encodedCredentials}`,
         },
@@ -101,13 +102,12 @@ const handleQuantityChange = (bookId, value) => {
       };
 
       axios
-        .post("http://localhost:8080/api/cart/updateCart", requestBody, {
+        .post(getHostName()+API.updateCart, requestBody, {
           headers: {
             Authorization: `Basic ${encodedCredentials}`,
           },
         })
         .then((response) => {
-          console.log(response.data);
           setAddedBooks((prev) => new Set(prev).add(book.id));
         })
         .catch((error) => {

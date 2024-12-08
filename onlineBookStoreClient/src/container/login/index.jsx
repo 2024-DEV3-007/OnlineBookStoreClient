@@ -92,15 +92,14 @@ const handleRegister = async () => {
   };
 
 const handleLogin = async () => {
-    console.log("Attempting login with username:", formData.username);
+
     try {
-      const response = await axios.post("http://localhost:8080/api/login", {
+      const response = await axios.post(getHostName()+API.login, {
         username: formData.username,
         password: formData.password,
       });
 
       const responseData = response.data;
-      console.log("Login response:", response.data);
 
       if (responseData.validResponse) {
         setSuccessMessage(responseData.message);
