@@ -1,0 +1,80 @@
+
+.bookscreen-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.header {
+  background-color: #3498db;
+  padding: 30px;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 40px;
+}
+
+.bookstore-heading {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.user-greeting-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.username {
+  font-size: 25px;
+  font-weight: bold;
+  position: fixed;
+  right:300px;
+}
+
+.cart-btn {
+ padding: 10px;
+   font-size: 16px;
+   cursor: pointer;
+   color: white;
+   border: none;
+   border-radius: 5px;
+   background-color: #007bff;
+   position: fixed;
+   right: 150px;
+}
+
+.book-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.book-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.book-item h3 {
+  font-size: 18px;
+  color: #34495e;
+}
+
+.logout-btn {
+   padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    background-color: transparent;
+    position: fixed;
+    right: 150px;
+    top: 50px;
+    font-weight: bold;
+    font-size: 18px;
+}
