@@ -1,14 +1,23 @@
 import React, { useState } from "react";
 import {EMPTY_FORM_DATA,LOGIN,USERNAME,PASSWORD,REGISTER,FIRST_NAME,LAST_NAME,CONFIRM_PASSWORD,ALREADY_A_USER,NEW_USER} from "../../utils/constants";
+import { FaCheck, FaTimes } from 'react-icons/fa';
 import "./index.css";
 
 const Login = () => {
 const [formData,setFormData] = useState(EMPTY_FORM_DATA);
 const [isNewUser, setIsNewUser] = useState(false);
-
+const [isPasswordMatch, setIsPasswordMatch] = useState(false);
+const [hasTypedConfirmPassword, setHasTypedConfirmPassword] = useState(false);
 
 const updateFormData = (e) => {
  setFormData({ ...formData, [e.target.name]: e.target.value });
+ if (e.target.name === "confirmPassword" && formData.password) {
+       setHasTypedConfirmPassword(true);
+       setIsPasswordMatch(formData.password === e.target.value);
+     } else if (e.target.name == "password" && hasTypedConfirmPassword) {
+            setHasTypedConfirmPassword(false);
+            setIsPasswordMatch(formData.confirmPassword === e.target.value);
+     }
   };
 
 const toggleNewUser = () => {
@@ -16,7 +25,7 @@ const toggleNewUser = () => {
   setFormData(EMPTY_FORM_DATA);
   };
 
-  const validateLoginForm = () => {
+  const isLoginFormInvalid = () => {
     return isFieldEmptyInLoginForm();
   };
 
@@ -24,9 +33,13 @@ const toggleNewUser = () => {
     return !formData.username || !formData.password;
   }
 
-  const validateRegisterForm = () => {
-    return isFieldEmptyInRegisterForm();
+  const isRegisterFormInvalid = () => {
+    return isFieldEmptyInRegisterForm() || isPasswordMismatch();
   };
+
+  const isPasswordMismatch = () =>{
+    return formData.password !== formData.confirmPassword;
+  }
 
   const isFieldEmptyInRegisterForm=() => {
     return !formData.username || !formData.password || !formData.firstName || !formData.lastName || !formData.confirmPassword
@@ -48,11 +61,21 @@ const toggleNewUser = () => {
               </>)}
             <input type="password" name="password" placeholder={PASSWORD} value={formData.password}
                     onChange={updateFormData} />
-         {isNewUser && (
+         {isNewUser  && ( <div className="form-group confirm-password-container">
                 <input type="password" name="confirmPassword" placeholder={CONFIRM_PASSWORD} value={formData.confirmPassword}
                           onChange={updateFormData}/>
+                {hasTypedConfirmPassword && (
+                                <div className="password-validation-icon">
+                                  {isPasswordMatch ? (
+                                    <FaCheck data-testid="password-match" style={{ color: "green" }} />
+                                  ) : (
+                                    <FaTimes data-testid="password-notmatch"style={{ color: "red" }} />
+                                  )}
+                                </div>
+                )}
+               </div>
          )}
-        <button className="form-button" data-testid="login-id" onClick={()=>{}} disabled={isNewUser?validateRegisterForm():validateLoginForm()}>
+        <button className="form-button" data-testid="login-id" onClick={()=>{}} disabled={isNewUser?isRegisterFormInvalid():isLoginFormInvalid()}>
             {isNewUser ? REGISTER : LOGIN}
         </button>
         <button className={"form-button already-user"} data-testid="toggle-user-type"
@@ -60,6 +83,7 @@ const toggleNewUser = () => {
           {isNewUser ? ALREADY_A_USER : NEW_USER}
         </button>
          </div>
+
       </div>
     </div>
  );

@@ -57,3 +57,14 @@ input {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.confirm-password-container {
+  position: relative;
+}
+
+.password-validation-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}

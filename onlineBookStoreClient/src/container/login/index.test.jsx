@@ -87,3 +87,62 @@ test("Register button should be enabled only after filling all the fields", () =
     fireEvent.change(confirmPasswordInput, { target: { value: 'password123' } });
     expect(registerButton).toBeEnabled();
  });
+
+ test("Display FaTimes when Password and ConfirmPassword are not same", () => {
+     render(<Login />);
+        const toggleUserTypeButton = screen.getByRole('button', { name: /New User/i });
+        fireEvent.click(toggleUserTypeButton);
+        const registerButton = screen.getByTestId('login-id');
+        expect(registerButton).toBeDisabled();
+        const userNameInput = screen.getByPlaceholderText('Username');
+        const firstNameInput = screen.getByPlaceholderText('First Name');
+        const lastNameInput = screen.getByPlaceholderText('Last Name');
+        const passwordInput = screen.getByPlaceholderText('Password');
+        const confirmPasswordInput = screen.getByPlaceholderText('Confirm Password');
+        fireEvent.change(userNameInput, { target: { value: 'testUser' } });
+        fireEvent.change(firstNameInput, { target: { value: 'John' } });
+        fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
+        fireEvent.change(passwordInput, { target: { value: 'password123' } });
+        fireEvent.change(confirmPasswordInput, { target: { value: 'password' } });
+        expect(screen.getByTestId('password-notmatch')).toBeInTheDocument();
+
+  });
+
+  test("Display FaCheck when Password and ConfirmPassword are same", () => {
+       render(<Login />);
+          const toggleUserTypeButton = screen.getByRole('button', { name: /New User/i });
+          fireEvent.click(toggleUserTypeButton);
+          const registerButton = screen.getByTestId('login-id');
+          expect(registerButton).toBeDisabled();
+          const userNameInput = screen.getByPlaceholderText('Username');
+          const firstNameInput = screen.getByPlaceholderText('First Name');
+          const lastNameInput = screen.getByPlaceholderText('Last Name');
+          const passwordInput = screen.getByPlaceholderText('Password');
+          const confirmPasswordInput = screen.getByPlaceholderText('Confirm Password');
+          fireEvent.change(userNameInput, { target: { value: 'testUser' } });
+          fireEvent.change(firstNameInput, { target: { value: 'John' } });
+          fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
+          fireEvent.change(passwordInput, { target: { value: 'password123' } });
+          fireEvent.change(confirmPasswordInput, { target: { value: 'password123' } });
+          expect(screen.getByTestId('password-match')).toBeInTheDocument();
+    });
+
+ test("If Password and Confirm password not same,Register button should not be enabled", () => {
+    render(<Login />);
+       const toggleUserTypeButton = screen.getByRole('button', { name: /New User/i });
+       fireEvent.click(toggleUserTypeButton);
+       const registerButton = screen.getByTestId('login-id');
+       expect(registerButton).toBeDisabled();
+       const userNameInput = screen.getByPlaceholderText('Username');
+       const firstNameInput = screen.getByPlaceholderText('First Name');
+       const lastNameInput = screen.getByPlaceholderText('Last Name');
+       const passwordInput = screen.getByPlaceholderText('Password');
+       const confirmPasswordInput = screen.getByPlaceholderText('Confirm Password');
+       fireEvent.change(userNameInput, { target: { value: 'testUser' } });
+       fireEvent.change(firstNameInput, { target: { value: 'John' } });
+       fireEvent.change(lastNameInput, { target: { value: 'Doe' } });
+       fireEvent.change(passwordInput, { target: { value: 'password123' } });
+       fireEvent.change(confirmPasswordInput, { target: { value: 'password' } });
+       expect(registerButton).toBeDisabled;
+ });
+
