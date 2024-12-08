@@ -4,17 +4,25 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { render, screen, fireEvent, waitFor} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import BookStore from "./index";
+import {useNavigate } from "react-router-dom";
+
+const books = [{ id: 1, title: 'Book 1', author: 'Author 1', price: 10 },
+                  { id: 2, title: 'Book 2', author: 'Author 2', price: 15 },];
+const fetchCartData = [{ bookId: 1, quantity: 1 },{ bookId: 2, quantity: 1 },];
+
+beforeEach(() => {
+   axios.get.mockResolvedValueOnce({ data: books });
+   axios.get.mockResolvedValueOnce({ data: fetchCartData });
+  });
 
 afterEach(() => {
   jest.clearAllMocks();
   axios.get.mockClear();
+  axios.post.mockClear();
 })
 jest.mock("axios");
 
 test('Fetch All Available Books and Displays it in the Online Book Store Screen', () => {
-
-    const mockBooksData = [{ id: 1, title: 'Book 1' },{ id: 2, title: 'Book 2' },];
-    axios.get.mockResolvedValueOnce({ data: mockBooksData });
 
     render(<Router initialEntries={["/books", { state: { username: "username", password: "abc" } }]}>
             <BookStore /></Router>);
@@ -28,9 +36,6 @@ test('Fetch All Available Books and Displays it in the Online Book Store Screen'
 })
 
 test('Displays Online BookStore Heading , Cart in the screen', () => {
-
-    const mockBooksData = [{ id: 1, title: 'Book 1' },{ id: 2, title: 'Book 2' },];
-    axios.get.mockResolvedValueOnce({ data: mockBooksData });
 
     render(<Router initialEntries={["/books", { state: { username: "username", password: "abc" } }]}>
             <BookStore /></Router>
@@ -48,12 +53,6 @@ test('Displays Online BookStore Heading , Cart in the screen', () => {
 
 test('Quantity Picker is displayed and user can select the quantity', async() => {
 
-    const books = [
-        { id: 1, title: 'Book 1', author: 'Author 1', price: 10 },
-        { id: 2, title: 'Book 2', author: 'Author 2', price: 15 },
-    ];
-
-    axios.get.mockResolvedValueOnce({ data: books });
     render(<Router initialEntries={["/books", { state: { username: "username", password: "abc" } }]}>
             <BookStore/></Router>
     );
@@ -76,12 +75,6 @@ test('Quantity Picker is displayed and user can select the quantity', async() =>
 
 test("User Select the quantity and add item to the cart",  async() => {
 
-    const books = [
-        { id: 1, title: 'Book 1', author: 'Author 1', price: 10 },
-        { id: 2, title: 'Book 2', author: 'Author 2', price: 15 },
-    ];
-
-    axios.get.mockResolvedValueOnce({ data: books });
     axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
         updatedCart: [{ bookId: 1, quantity: 2 },{ bookId: 3, quantity: 1 },]}
     });
@@ -111,12 +104,6 @@ test("User Select the quantity and add item to the cart",  async() => {
 
 test("The count of added items should be displayed in the cart",  async() => {
 
-    const books = [
-        { id: 1, title: 'Book 1', author: 'Author 1', price: 10 },
-        { id: 2, title: 'Book 2', author: 'Author 2', price: 15 },
-    ];
-
-    axios.get.mockResolvedValueOnce({ data: books });
     axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
         updatedCart: [{ bookId: 1, quantity: 2 },{ bookId: 3, quantity: 1 },]}
     });
@@ -139,5 +126,23 @@ test("The count of added items should be displayed in the cart",  async() => {
      expect(cartValue).toBeInTheDocument();
      expect(cartValue).toHaveTextContent('Cart (3)');;
   });
+
+test('Fetch The Cart Data Of The User', async() => {
+
+
+    render(<Router initialEntries={["/books", { state: { username: "username", password: "abc" } }]}>
+            <BookStore /></Router>);
+
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+        const cartValue = screen.getByTestId('cart-button');
+        expect(cartValue).toBeInTheDocument();
+      });
+
+    expect(axios.get).toHaveBeenCalledWith('http://localhost:8080/api/cart', {
+          headers: { Authorization: `Basic dW5kZWZpbmVkOnVuZGVmaW5lZA==` },
+    });
+})
 
 

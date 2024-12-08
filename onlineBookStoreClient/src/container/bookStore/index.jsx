@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {useLocation } from "react-router-dom";
+import {useLocation, useNavigate } from "react-router-dom";
 import "./index.css";
 
  const BookStore = () => {
 
   const location = useLocation();
+  const navigate = useNavigate();
   const { username, password } = location.state || {};
   const [books, setBooks] = useState([]);
   const [error, setError] = useState(null);
@@ -19,6 +20,7 @@ import "./index.css";
 
   useEffect(() => {
     fetchBooks();
+    fetchCartData();
   }, []);
 
 const fetchBooks = () => {
@@ -37,9 +39,48 @@ const fetchBooks = () => {
       });
   };
 
+const fetchCartData = () => {
+    setError(null);
+    axios
+      .get("http://localhost:8080/api/cart", {
+        headers: {
+          Authorization: `Basic ${encodedCredentials}`,
+        },
+      })
+      .then((response) => {
+        handleCartItemResponse(response.data);
+      })
+      .catch((error) => {
+        setError("Error fetching cart data. Please try again.");
+      });
+  };
+
+const handleCartItemResponse = (cartItemFromResponse) => {
+    setTheItemInCart(cartItemFromResponse);
+    setTheAddedBookSet(cartItemFromResponse);
+    setUpdateQuantities(cartItemFromResponse);
+  }
+
+const setTheItemInCart = (cartItemFromResponse) => {
+   const cartData = cartItemFromResponse.map(item => ({bookId: item.book.id,quantity: item.quantity}));
+   setCart(cartData);
+  };
+
+const setTheAddedBookSet = (cartItemFromResponse) => {
+  const addedBooksSet = new Set(cartItemFromResponse.map(item => item.book.id));
+  setAddedBooks(addedBooksSet);
+  };
+
+const setUpdateQuantities = (cartItemFromResponse) => {
+ const updatedQuantities = {};
+ cartItemFromResponse.forEach((item) => {updatedQuantities[item.book.id] = item.quantity;});
+ setQuantities(updatedQuantities);
+};
+
 const handleQuantityChange = (bookId, value) => {
     setQuantities((prev) => ({ ...prev, [bookId]: parseInt(value, 10) }));
   };
+
   const handleAddToCart = (book) => {
       const cartItemsToAdd = { bookId: book.id, quantity: quantities[book.id] || 1 };
       const updatedCart = [...cartItem, cartItemsToAdd]
@@ -51,7 +92,7 @@ const handleQuantityChange = (bookId, value) => {
         items: updatedCart,
         ordered: order,
       };
-      console.log("requestBody:", requestBody);
+
       axios
         .post("http://localhost:8080/api/cart/updateCart", requestBody, {
           headers: {
@@ -63,7 +104,6 @@ const handleQuantityChange = (bookId, value) => {
           setAddedBooks((prev) => new Set(prev).add(book.id));
         })
         .catch((error) => {
-          console.error("Error adding to cart:", error);
           alert("Failed to add book to cart.");
         });
     };
@@ -72,15 +112,30 @@ const getTotalItems = () => {
   return cartItem.reduce((total, item) => total + item.quantity, 0);
 };
 
+ const handleViewCart = () => {
+    navigate("/cart", {
+      state: {
+        username: username,
+        password: password,
+      },
+    });
+  };
+
+const handleLogout = () => {
+   setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+    navigate("/");
+  };
   return (
     <div className="bookscreen-container">
       <div className="header">
         <h1 className="bookstore-heading" data-testid="bookstore-heading">Online Book Store</h1>
-        <button className="logout-btn" data-testid="logout-button">Logout</button>
+        <button className="logout-btn" data-testid="logout-button" onClick={handleLogout}>Logout</button>
       </div>
       <div className="user-greeting-container">
         <span className="username" data-testid="user-greeting">Hi,{username}</span>
-          <button className="cart-btn" data-testid="cart-button">
+          <button className="cart-btn" data-testid="cart-button" onClick={handleViewCart}>
               Cart {getTotalItems() > 0 && <span>({getTotalItems()})</span>}
           </button>
       </div>
