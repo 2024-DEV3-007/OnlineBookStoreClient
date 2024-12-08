@@ -6,3 +6,47 @@
   height: 100vh;
   background-color: #f5f5f5;
 }
+
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.form-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #1973d3;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.form-button.already-user {
+  background-color: #64bad6;
+  color: white;
+}
+
