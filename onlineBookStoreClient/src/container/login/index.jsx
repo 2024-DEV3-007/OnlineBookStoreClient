@@ -16,21 +16,26 @@ const [errorMessage, setErrorMessage] = useState("");
 
 const updateFormData = (e) => {
  setFormData({ ...formData, [e.target.name]: e.target.value });
- if (e.target.name === "confirmPassword" && formData.password)
-       handleConfirmPasswordChange(e.target.value)
- else if (e.target.name == "password" && hasTypedConfirmPassword)
-        handlePasswordChange(e.target.value)
+if(e.target.name === "confirmPassword" || e.target.name === "password")
+    handlePasswordConfirmationIcon(e.target.name,e.target.value)
   };
 
+const handlePasswordConfirmationIcon =(targetName,value) => {
+    if(value!=''){
+        targetName === "confirmPassword" ? handleConfirmPasswordChange(value) : handlePasswordChange(value)
+    }
+};
+
 const handleConfirmPasswordChange = (value) => {
-  setHasTypedConfirmPassword(true);
-  setIsPasswordMatch(formData.password === value);
+    formData.password ? setHasTypedConfirmPassword(true) : etHasTypedConfirmPassword(false)
+    setIsPasswordMatch(formData.password === value);
 };
 
 const handlePasswordChange = (value) => {
-  setHasTypedConfirmPassword(false);
-  setIsPasswordMatch(value === formData.confirmPassword);
+    formData.confirmPassword ? setHasTypedConfirmPassword(true) : setHasTypedConfirmPassword(false);
+    setIsPasswordMatch(value === formData.confirmPassword);
 };
+
 
 const toggleNewUser = () => {
   setIsNewUser(!isNewUser);
