@@ -14,6 +14,7 @@ import "./index.css";
   const [cartItem, setCart] = useState([]);
   const [addedBooks, setAddedBooks] = useState(new Set());
   const [order, setOrder] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
 
   const credentials = `${username}:${password}`;
   const encodedCredentials = btoa(credentials);
@@ -83,7 +84,13 @@ const handleQuantityChange = (bookId, value) => {
 
   const handleAddToCart = (book) => {
       const cartItemsToAdd = { bookId: book.id, quantity: quantities[book.id] || 1 };
-      const updatedCart = [...cartItem, cartItemsToAdd]
+
+    const updatedCart = cartItem.some(item => item.bookId === cartItemsToAdd.bookId)
+    ? cartItem.map(item =>
+        item.bookId === cartItemsToAdd.bookId
+          ? { ...item, quantity: cartItemsToAdd.quantity }
+          : item
+      ) : [...cartItem, cartItemsToAdd];
       setCart(updatedCart);
       const addedBooksSet = new Set(updatedCart.map(item => item.bookId));
       setAddedBooks(addedBooksSet);
