@@ -1,19 +1,20 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import Login from "./index";
 
 
 test('Displays Login header in the Login page', () => {
 
-    render(<Login />);
+    render(<Router><Login /></Router>);
     const titleElement = screen.getByTestId('login-heading');
     expect(titleElement).toBeInTheDocument();
 })
 
 test('Displays Username and password field with Login button', () => {
 
-    render(<Login />);
+     render(<Router><Login /></Router>);
     const inputUsername = screen.getByPlaceholderText("Username");
     fireEvent.change(inputUsername, { target: { value: "User" } });
     expect(inputUsername.value).toBe("User");
@@ -28,7 +29,7 @@ test('Displays Username and password field with Login button', () => {
 })
 
 test("Toggle between register screen and Login Screen when user clicks on New User button", () => {
-    render(<Login />);
+     render(<Router><Login /></Router>);
       let toggleUserTypeButton = screen.getByTestId('toggle-user-type');
       let loginOrRegisterButton = screen.getByTestId('login-id');
       let firstNameField = screen.queryByPlaceholderText('First Name');
@@ -59,7 +60,7 @@ test("Toggle between register screen and Login Screen when user clicks on New Us
 });
 
 test("Login button should be enabled only after filling all the fields", () => {
-    render(<Login />);
+     render(<Router><Login /></Router>);
     const LoginButton = screen.getByTestId('login-id');
     expect(LoginButton).toBeDisabled();
     const userNameInput = screen.getByPlaceholderText('Username');
@@ -70,7 +71,7 @@ test("Login button should be enabled only after filling all the fields", () => {
  });
 
 test("Register button should be enabled only after filling all the fields", () => {
-    render(<Login />);
+     render(<Router><Login /></Router>);
     const toggleUserTypeButton = screen.getByTestId('toggle-user-type');
     fireEvent.click(toggleUserTypeButton);
     const registerButton = screen.getByTestId('login-id');
@@ -89,7 +90,7 @@ test("Register button should be enabled only after filling all the fields", () =
  });
 
  test("Display FaTimes when Password and ConfirmPassword are not same", () => {
-     render(<Login />);
+      render(<Router><Login /></Router>);
         const toggleUserTypeButton = screen.getByRole('button', { name: /New User/i });
         fireEvent.click(toggleUserTypeButton);
         const registerButton = screen.getByTestId('login-id');
@@ -109,7 +110,7 @@ test("Register button should be enabled only after filling all the fields", () =
   });
 
   test("Display FaCheck when Password and ConfirmPassword are same", () => {
-       render(<Login />);
+        render(<Router><Login /></Router>);
           const toggleUserTypeButton = screen.getByRole('button', { name: /New User/i });
           fireEvent.click(toggleUserTypeButton);
           const registerButton = screen.getByTestId('login-id');
@@ -128,7 +129,7 @@ test("Register button should be enabled only after filling all the fields", () =
     });
 
  test("If Password and Confirm password not same,Register button should not be enabled", () => {
-    render(<Login />);
+     render(<Router><Login /></Router>);
        const toggleUserTypeButton = screen.getByRole('button', { name: /New User/i });
        fireEvent.click(toggleUserTypeButton);
        const registerButton = screen.getByTestId('login-id');

@@ -11,14 +11,21 @@ const [hasTypedConfirmPassword, setHasTypedConfirmPassword] = useState(false);
 
 const updateFormData = (e) => {
  setFormData({ ...formData, [e.target.name]: e.target.value });
- if (e.target.name === "confirmPassword" && formData.password) {
-       setHasTypedConfirmPassword(true);
-       setIsPasswordMatch(formData.password === e.target.value);
-     } else if (e.target.name == "password" && hasTypedConfirmPassword) {
-            setHasTypedConfirmPassword(false);
-            setIsPasswordMatch(formData.confirmPassword === e.target.value);
-     }
+ if (e.target.name === "confirmPassword" && formData.password)
+       handleConfirmPasswordChange(e.target.value)
+ else if (e.target.name == "password" && hasTypedConfirmPassword)
+        handlePasswordChange(e.target.value)
   };
+
+const handleConfirmPasswordChange = (value) => {
+  setHasTypedConfirmPassword(true);
+  setIsPasswordMatch(formData.password === value);
+};
+
+const handlePasswordChange = (value) => {
+  setHasTypedConfirmPassword(false);
+  setIsPasswordMatch(value === formData.confirmPassword);
+};
 
 const toggleNewUser = () => {
   setIsNewUser(!isNewUser);
