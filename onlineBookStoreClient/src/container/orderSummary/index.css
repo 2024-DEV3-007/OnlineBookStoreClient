@@ -34,3 +34,13 @@
   color: #4caf50;
   margin-bottom: 20px;
 }
+.go-home-btn {
+  position: fixed;
+  left: 20px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 50px;
+  z-index: 1000;
+  border-radius: 50%;
+}

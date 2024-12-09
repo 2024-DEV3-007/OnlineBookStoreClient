@@ -5,17 +5,29 @@ import './index.css';
 const OrderSummary = () => {
 
   const location = useLocation();
+  const navigate = useNavigate();
   const { cartItems, username, password } = location.state || {};
 
   const grandTotal = cartItems.reduce(
     (total, item) => total + item.book.price * item.quantity, 0
   );
 
+  const handleCancel = () => {
+      navigate('/books', { state: { username, password } });
+  };
+
+const handleLogout = () => {
+   setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+    navigate("/");
+  };
+
  return (
      <div className="order-summary-container">
        <div className="header">
          <h1 className="bookstore-heading" data-testid="heading">Online Book Store</h1>
-         <button className="logout-btn" >Logout</button>
+         <button className="logout-btn" data-testid="logout" onClick={handleLogout}>Logout</button>
        </div>
 
        <div className="order-summary" >
@@ -34,6 +46,7 @@ const OrderSummary = () => {
          <div className="grand-total">
            <h3>Grand Total: €{grandTotal.toFixed(2)}</h3>
          </div>
+         <button className="cancel-button" data-testid="cancel-button" onClick={handleCancel}>Go Back Home </button>
        </div>
      </div>
    );
