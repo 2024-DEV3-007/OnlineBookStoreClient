@@ -133,3 +133,26 @@ test('User can remove the item from the cart', async() => {
     );
 })
 
+test('Grand Total of the shopping should be displayed', async() => {
+
+     axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
+     updatedCart: [{ bookId: 1, quantity: 1 },{ bookId: 3, quantity: 1 },]}
+    });
+
+    render(<Router initialEntries={["/cart", { state: { username: "username", password: "abc" } }]}>
+            <ShoppingCart /></Router>);
+
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+      });
+
+   expect(screen.getByTestId('grand-total')).toBeInTheDocument();
+   expect(screen.getByTestId('grand-total').textContent).toBe('Grand Total: €100.00');
+   expect(screen.getByTestId('continue-shopping')).toBeInTheDocument();
+   expect(screen.getByTestId('checkout-order')).toBeInTheDocument();
+   const decrementButton = screen.getByText('-');
+    fireEvent.click(decrementButton);
+    expect(screen.getByTestId('grand-total').textContent).toBe('Grand Total: €80.00');
+})
+

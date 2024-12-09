@@ -96,6 +96,19 @@ const handleQuantityChange = (bookId, quantity) => {
     handleQuantityChange(bookId, newQuantity);
   };
 
+ const grandTotal = cartItems.reduce(
+    (total, item) => total + item.book.price * item.quantity,0
+  );
+
+const handleGoHome = () => {
+    navigate("/books", {
+      state: {
+        username: username,
+        password: password,
+      },
+    });
+  };
+
 const handleRemoveItem = (bookId) => {
 
     setCartItems((prevItems) =>prevItems.filter((item) => item.bookId !== bookId));
@@ -154,9 +167,19 @@ const handleRemoveItem = (bookId) => {
                     </div>
                 ))
              ) : (
-               <p>Your cart is empty.</p>
+               <div className="checkout-section">
+                <p>Your cart is empty.</p>
+                  <button className="continue-shopping" data-testid="continue-shopping"> Continue Shopping </button>
+               </div>
              )}
            </div>
+           {cartItems.length > 0 && (
+             <div className="checkout-section">
+                <p data-testid="grand-total"><strong>Grand Total:</strong> €{grandTotal.toFixed(2)}</p>
+                <button className="continue-shopping" data-testid="continue-shopping"> Continue Shopping </button>
+                 <button className="checkout-button" data-testid="checkout-order"> Checkout Order</button>
+             </div>
+           )}
          </div>
        );
      };
