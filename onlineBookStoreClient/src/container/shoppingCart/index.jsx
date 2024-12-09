@@ -129,6 +129,29 @@ const handleRemoveItem = (bookId) => {
          setError("Failed to add book to cart.");
       });
   };
+
+   const handleCheckout = () => {
+
+      const orderValue = true;
+      setOrder(orderValue);
+      const requestBody = {items: bookDetails,ordered: true,};
+
+      axios
+        .post(getHostName()+API.updateCart, requestBody, {
+          headers: {
+            Authorization: `Basic ${btoa(username + ':' + password)}`,
+          },
+        })
+        .then((response) => {
+          navigate('/orderSummary', {
+            state: { cartItems, username, password },
+          });
+        })
+        .catch((error) => {
+          setError("Failed to add book to cart.");
+        });
+    };
+
     return (
      <div className="cart-page-container">
         <div className="header">
@@ -169,15 +192,15 @@ const handleRemoveItem = (bookId) => {
              ) : (
                <div className="checkout-section">
                 <p>Your cart is empty.</p>
-                  <button className="continue-shopping" data-testid="continue-shopping"> Continue Shopping </button>
+                  <button className="continue-shopping" data-testid="continue-shopping" onClick={handleGoHome}> Continue Shopping </button>
                </div>
              )}
            </div>
            {cartItems.length > 0 && (
              <div className="checkout-section">
                 <p data-testid="grand-total"><strong>Grand Total:</strong> €{grandTotal.toFixed(2)}</p>
-                <button className="continue-shopping" data-testid="continue-shopping"> Continue Shopping </button>
-                 <button className="checkout-button" data-testid="checkout-order"> Checkout Order</button>
+                <button className="continue-shopping" data-testid="continue-shopping" onClick={handleGoHome}> Continue Shopping </button>
+                 <button className="checkout-button" data-testid="checkout-order" onClick={handleCheckout}> Checkout Order</button>
              </div>
            )}
          </div>

@@ -156,3 +156,44 @@ test('Grand Total of the shopping should be displayed', async() => {
     expect(screen.getByTestId('grand-total').textContent).toBe('Grand Total: €80.00');
 })
 
+test('Click on Continue Shopping will navigate to Book Store Page', async() => {
+
+     axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
+     updatedCart: [{ bookId: 1, quantity: 1 },{ bookId: 3, quantity: 1 },]}
+    });
+
+    render(<Router initialEntries={["/cart", { state: { username: "username", password: "abc" } }]}>
+            <ShoppingCart /></Router>);
+
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+      });
+
+   expect(screen.getByTestId('continue-shopping')).toBeInTheDocument();
+   fireEvent.click(screen.getByTestId('continue-shopping'));
+   expect(screen.getByTestId('bookstore-heading')).toBeInTheDocument();
+})
+
+test('Click on Check Out Will Check Out the Cart and will navigate to the summary page', async() => {
+
+     axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
+     updatedCart: [{ bookId: 1, quantity: 1 },{ bookId: 3, quantity: 1 },]}
+    });
+
+    render(<Router initialEntries={["/cart", { state: { username: "username", password: "abc" } }]}>
+            <ShoppingCart /></Router>);
+
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+      });
+
+   expect(screen.getByTestId('checkout-order')).toBeInTheDocument();
+   fireEvent.click(screen.getByTestId('checkout-order'));
+   expect(axios.post).toHaveBeenCalledWith('http://localhost:8080/api/cart/updateCart',{
+                     items: [{ bookId: 123, quantity: 5 }],ordered: true,},{
+                     headers: { Authorization: `Basic dW5kZWZpbmVkOnVuZGVmaW5lZA==` },}
+       );
+})
+
