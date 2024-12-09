@@ -114,3 +114,22 @@ test('Total Price of each item should be displayed', async() => {
     expect(totalPrice.textContent).toBe(' Total: €100.00');
 })
 
+test('User can remove the item from the cart', async() => {
+
+    axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
+        updatedCart: [{ bookId: 1, quantity: 2 },]}
+    });
+    render(<Router initialEntries={["/cart", { state: { username: "username", password: "abc" } }]}>
+            <ShoppingCart /></Router>);
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+      });
+   expect(screen.getByTestId('remove-button')).toBeInTheDocument();
+   fireEvent.click(screen.getByTestId('remove-button'));
+    expect(axios.post).toHaveBeenCalledWith('http://localhost:8080/api/cart/updateCart',{
+                  items: [],ordered: false,},{
+                  headers: { Authorization: `Basic dW5kZWZpbmVkOnVuZGVmaW5lZA==` },}
+    );
+})
+

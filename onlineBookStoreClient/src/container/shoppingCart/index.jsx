@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import {getHostName,API} from "../../utils/constants";
+import { FaTrash  } from 'react-icons/fa';
 import './index.css';
 
 const ShoppingCart = () => {
@@ -95,6 +96,26 @@ const handleQuantityChange = (bookId, quantity) => {
     handleQuantityChange(bookId, newQuantity);
   };
 
+const handleRemoveItem = (bookId) => {
+
+    setCartItems((prevItems) =>prevItems.filter((item) => item.bookId !== bookId));
+    const updatedCart = bookDetails.filter(item => item.bookId !== bookId);
+    setBookDetails(updatedCart);
+    const requestBody = {items: updatedCart,ordered: order,};
+
+    axios
+      .post(getHostName()+API.updateCart, requestBody, {
+        headers: {
+          Authorization: `Basic ${btoa(username + ':' + password)}`,
+        },
+      })
+      .then((response) => {
+        fetchCartItems();
+      })
+      .catch((error) => {
+         setError("Failed to add book to cart.");
+      });
+  };
     return (
      <div className="cart-page-container">
         <div className="header">
@@ -106,6 +127,10 @@ const handleQuantityChange = (bookId, quantity) => {
             {cartItems.length > 0 ? (
                cartItems.map((item) => (
                  <div key={item.book.id} className="cart-item">
+                 <div className="remove-btn-container" >
+                      <button className="remove-btn" data-testid="remove-button" onClick={() => handleRemoveItem(item.book.id)}>
+                              <FaTrash /> </button>
+                      </div>
                    <div className="item-details">
                      <h3>{item.book.title}</h3>
                      <p>Author: {item.book.author}</p>
