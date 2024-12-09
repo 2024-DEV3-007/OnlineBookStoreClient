@@ -5,7 +5,7 @@ import { render, screen, fireEvent, waitFor} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ShoppingCart from "./index";
 
-const fetchCartData = [{id: 1,book: {id: 123,title: 'Sample Book',author: 'Sample Author',price: 20.0},quantity: 5}];
+const fetchCartData = [{id: 1,book: {id: 123,title: 'Sample Book',author: 'Sample Author',price: 20.0},quantity: 5}]
 
 beforeEach(() => {
    axios.get.mockResolvedValueOnce({ data: fetchCartData });
@@ -92,5 +92,25 @@ test('User can decrement the quantity in the cart page', async() => {
                       headers: { Authorization: `Basic dW5kZWZpbmVkOnVuZGVmaW5lZA==` },
                   }
     );
+})
+
+test('Total Price of each item should be displayed', async() => {
+
+     axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
+     updatedCart: [{ bookId: 1, quantity: 1 },{ bookId: 3, quantity: 1 },]}
+    });
+
+    render(<Router initialEntries={["/cart", { state: { username: "username", password: "abc" } }]}>
+            <ShoppingCart /></Router>);
+
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+      });
+
+   expect(screen.getByTestId('quantity-picker')).toBeInTheDocument();
+   expect(screen.getByTestId('total-price')).toBeInTheDocument();
+    const totalPrice = screen.getByTestId('total-price');
+    expect(totalPrice.textContent).toBe(' Total: €100.00');
 })
 

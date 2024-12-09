@@ -114,14 +114,17 @@ const handleQuantityChange = (bookId, quantity) => {
                       <div className="quantity-container">
                         <label htmlFor={`quantity-${item.book.id}`} className="quantity-label" data-testid="quantity-picker"> Quantity: </label>
                           <div className="quantity-picker-cart">
-                            <button className="quantity-btn" data-testid="quantity-increment" onClick={() => decrementQuantity(item.book.id, item.quantity)}
+                            <button className="quantity-btn" data-testid="quantity-increment"
+                                onClick={() => decrementQuantity(item.book.id, item.quantity)}
+                                  disabled={item.quantity <= 1}
                              > -
                             </button>
                             <input type="text" value={item.quantity} readOnly className="quantity-input" data-testid={`quantity-${item.book.id}`}/>
                             <button className="quantity-btn" onClick={() => incrementQuantity(item.book.id, item.quantity)}
-                              > +
+                               disabled={item.quantity >= 50} > +
                             </button>
                           </div>
+                          <span className="total-price" data-testid="total-price"> Total: €{(item.book.price * item.quantity).toFixed(2)}</span>
                         </div>
                     </div>
                 ))
