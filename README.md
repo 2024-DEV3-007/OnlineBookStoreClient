@@ -41,6 +41,7 @@ Each commit messages contains **Title**. The title consists of the type of the m
   ```bash
     npm run dev
 
-Once the application started successfully, you can access the application by launching the below url in the browser:
+- Once the application started successfully, you can access the application by launching the below url in the browser:
   ```bash
     http://localhost:3000/
+- The Backend for this project is configured in ` https://github.com/2024-DEV3-007/OnlineBoookStore.git`. Run the backend application first followed by the frontend.
