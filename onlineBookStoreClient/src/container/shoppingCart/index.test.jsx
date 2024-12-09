@@ -197,3 +197,22 @@ test('Click on Check Out Will Check Out the Cart and will navigate to the summar
        );
 })
 
+test('Logout Button Should be displayed', async() => {
+
+     axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
+     updatedCart: [{ bookId: 1, quantity: 1 },{ bookId: 3, quantity: 1 },]}
+    });
+
+    render(<Router initialEntries={["/cart", { state: { username: "username", password: "abc" } }]}>
+            <ShoppingCart /></Router>);
+
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+      });
+
+   expect(screen.getByTestId('logout')).toBeInTheDocument();
+   fireEvent.click(screen.getByTestId('logout'));
+})
+
+

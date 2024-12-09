@@ -152,11 +152,18 @@ const handleRemoveItem = (bookId) => {
         });
     };
 
+const handleLogout = () => {
+   setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+    navigate("/");
+  };
+
     return (
      <div className="cart-page-container">
         <div className="header">
             <h1 className="bookstore-heading" data-testid="bookstore-heading">Online Book Store</h1>
-             <button className="logout-btn" >Logout</button>
+             <button className="logout-btn" data-testid="logout" onClick={handleLogout}>Logout</button>
         </div>
         <h2>My Cart</h2>
         <div className="cart-items-list">
