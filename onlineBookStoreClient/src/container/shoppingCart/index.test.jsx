@@ -11,6 +11,10 @@ beforeEach(() => {
    axios.get.mockResolvedValueOnce({ data: fetchCartData });
   });
 
+afterEach(() => {
+  jest.clearAllMocks();
+  axios.get.mockClear();
+})
 jest.mock("axios");
 
 test('Fetch The Cart Data Of The User and Display it in the cart page', async() => {
@@ -25,3 +29,68 @@ test('Fetch The Cart Data Of The User and Display it in the cart page', async() 
           headers: { Authorization: `Basic dW5kZWZpbmVkOnVuZGVmaW5lZA==` },
     });
 })
+
+test('User can increment the quantity in the cart page', async() => {
+
+    axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
+        updatedCart: [{ bookId: 1, quantity: 2 },{ bookId: 3, quantity: 1 },]}
+    });
+
+    render(<Router initialEntries={["/cart", { state: { username: "username", password: "abc" } }]}>
+            <ShoppingCart /></Router>);
+
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+      });
+
+   expect(screen.getByTestId('quantity-picker')).toBeInTheDocument();
+   const value = screen.getByTestId('quantity-123');
+   expect(screen.getByTestId('quantity-123').value).toBe('5');
+   const incrementButton = screen.getByText('+');
+   fireEvent.click(incrementButton);
+
+   await waitFor(() => {
+          expect(screen.getByTestId('quantity-123').value).toBe('6');
+    });
+
+    expect(axios.post).toHaveBeenCalledWith('http://localhost:8080/api/cart/updateCart',{
+                  items: [{ bookId: 123, quantity: 6 }],
+                  ordered: false,},{
+                      headers: { Authorization: `Basic dW5kZWZpbmVkOnVuZGVmaW5lZA==` },
+                  }
+    );
+})
+
+test('User can decrement the quantity in the cart page', async() => {
+
+    axios.post.mockResolvedValue({data: {success: true,message: "Cart updated successfully",
+        updatedCart: [{ bookId: 1, quantity: 2 },{ bookId: 3, quantity: 1 },]}
+    });
+
+    render(<Router initialEntries={["/cart", { state: { username: "username", password: "abc" } }]}>
+            <ShoppingCart /></Router>);
+
+    await waitFor(() => {
+        const bookStoreTitle = screen.getByTestId('bookstore-heading');
+        expect(bookStoreTitle).toBeInTheDocument();
+      });
+
+   expect(screen.getByTestId('quantity-picker')).toBeInTheDocument();
+   const value = screen.getByTestId('quantity-123');
+   expect(screen.getByTestId('quantity-123').value).toBe('5');
+   const decrementButton = screen.getByText('-');
+   fireEvent.click(decrementButton);
+
+   await waitFor(() => {
+          expect(screen.getByTestId('quantity-123').value).toBe('4');
+    });
+
+    expect(axios.post).toHaveBeenCalledWith('http://localhost:8080/api/cart/updateCart',{
+                  items: [{ bookId: 123, quantity: 4 }],
+                  ordered: false,},{
+                      headers: { Authorization: `Basic dW5kZWZpbmVkOnVuZGVmaW5lZA==` },
+                  }
+    );
+})
+

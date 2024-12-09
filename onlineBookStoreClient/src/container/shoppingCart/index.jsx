@@ -13,6 +13,7 @@ const ShoppingCart = () => {
   const [order, setOrder] = useState(false);
   const location = useLocation();
   const { username, password } = location.state || {};
+  const [error, setError] = useState(null);
 
 useEffect(() => {
     fetchCartItems();
@@ -20,32 +21,79 @@ useEffect(() => {
   const fetchCartItems = () => {
 
       axios
-        .get('http://localhost:8080/api/cart', {
+        .get(getHostName()+API.fetchCart, {
           headers: {
             Authorization: `Basic ${btoa(username + ':' + password)}`,
           },
         })
         .then((response) => {
           setCartItems(response.data);
-          const cartItemFromResponse = response.data;
-          const bookData = cartItemFromResponse.map(item => ({
-            bookId: item.book.id,
-            quantity: item.quantity
-          }));
-
-          console.log("bookData :", bookData);
-          setBookDetails(bookData);
-
-          const updatedQuantities = {};
-          cartItemFromResponse.forEach((item) => {
-            updatedQuantities[item.book.id] = item.quantity;
-          });
-          setQuantities(updatedQuantities);
+          handleCartItemResponse(response.data);
         })
         .catch((error) => {
-          //alert('Error fetching cart items. Please try again.');
+        setError("Error fetching cart data. Please try again.");
         });
     };
+
+const handleCartItemResponse = (cartItemFromResponse) => {
+    setResponseInBookDetail(cartItemFromResponse);
+    setUpdateQuantities(cartItemFromResponse);
+  }
+
+  const setResponseInBookDetail = (cartItemFromResponse) => {
+     const bookData = cartItemFromResponse.map(item => ({ bookId: item.book.id, quantity: item.quantity}));
+     setBookDetails(bookData);
+  }
+
+  const setUpdateQuantities = (cartItemFromResponse) => {
+     const updatedQuantities = {};
+     cartItemFromResponse.forEach((item) => {updatedQuantities[item.book.id] = item.quantity;});
+     setQuantities(updatedQuantities);
+    }
+
+  const incrementQuantity = (bookId, currentQuantity) => {
+    const newQuantity = currentQuantity + 1;
+    handleQuantityChange(bookId, newQuantity);
+  };
+
+const handleCartItemSet = (bookId, quantity) => {
+    setCartItems((prevItems) =>
+          prevItems.map((item) =>item.book.id === bookId ? { ...item, quantity: parseInt(quantity) }: item)
+    );
+  };
+
+const handleQuantityChange = (bookId, quantity) => {
+    handleCartItemSet(bookId, quantity);
+
+    const updatedCart = bookDetails.map(item =>
+      item.bookId === bookId
+        ? { ...item, quantity: parseInt(quantity) }
+        : item
+    );
+    setBookDetails(updatedCart);
+
+    const requestBody = {
+      items: updatedCart,
+      ordered: order,
+    };
+    axios
+      .post(getHostName()+API.updateCart, requestBody, {
+        headers: {
+          Authorization: `Basic ${btoa(username + ':' + password)}`,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        setError("Failed to add book to cart.");
+      });
+  };
+
+ const decrementQuantity = (bookId, currentQuantity) => {
+    const newQuantity = currentQuantity > 1 ? currentQuantity - 1 : 1;
+    handleQuantityChange(bookId, newQuantity);
+  };
 
     return (
      <div className="cart-page-container">
@@ -62,9 +110,21 @@ useEffect(() => {
                      <h3>{item.book.title}</h3>
                      <p>Author: {item.book.author}</p>
                      <p>Price: €{item.book.price.toFixed(2)}</p>
-                   </div>
-                 </div>
-               ))
+                     </div>
+                      <div className="quantity-container">
+                        <label htmlFor={`quantity-${item.book.id}`} className="quantity-label" data-testid="quantity-picker"> Quantity: </label>
+                          <div className="quantity-picker-cart">
+                            <button className="quantity-btn" data-testid="quantity-increment" onClick={() => decrementQuantity(item.book.id, item.quantity)}
+                             > -
+                            </button>
+                            <input type="text" value={item.quantity} readOnly className="quantity-input" data-testid={`quantity-${item.book.id}`}/>
+                            <button className="quantity-btn" onClick={() => incrementQuantity(item.book.id, item.quantity)}
+                              > +
+                            </button>
+                          </div>
+                        </div>
+                    </div>
+                ))
              ) : (
                <p>Your cart is empty.</p>
              )}
