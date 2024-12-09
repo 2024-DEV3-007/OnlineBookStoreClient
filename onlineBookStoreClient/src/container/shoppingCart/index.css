@@ -1,0 +1,66 @@
+.cart-page-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.cart-items-list {
+  margin-top: 20px;
+}
+
+.header {
+  background-color: #3498db;
+  padding: 30px;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.bookstore-heading {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+}
+.cart-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 8px;
+  max-width: 350px;
+  position: relative;
+}
+
+.cart-item h3 {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.cart-item p {
+  margin: 3px 0;
+  font-size: 0.9em;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  padding: 5px 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  border-radius: 4px;
+}
+
+.logout-btn {
+   padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    background-color: transparent;
+    position: fixed;
+    right: 150px;
+    top: 50px;
+    font-weight: bold;
+    font-size: 18px;
+}
